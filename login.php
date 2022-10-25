@@ -70,7 +70,7 @@
                 $img = $customer_row['img'];
 
                 ##### Set cookie for name #####
-                setcookie('name', $name, time()+3600);
+                setcookie('name', $name, time()+600);
 
                 ##### Display user info (2.1) #####
                 echo "<p>Welcome Customer: <strong>$name</strong></p>"; 
