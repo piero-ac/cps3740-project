@@ -71,7 +71,7 @@ for($i = 0; $i < $mids_update_length; $i++){
             $update_note = (strcmp($db_note, $notes[$i]) == 0) ? false : true;
 
             if($update_note){
-                $update_sql = "update CPS3740_2022F.Money_coronapi set note='$notes[$i]' where cid='$customer_id' and mid='$mid_to_possibly_update'";
+                $update_sql = "update CPS3740_2022F.Money_coronapi set note='$notes[$i]', mydatetime=NOW() where cid='$customer_id' and mid='$mid_to_possibly_update'";
                 $update_result = mysqli_query($con, $update_sql);
 
                 if($update_result){
