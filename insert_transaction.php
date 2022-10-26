@@ -69,7 +69,7 @@ if($amount <= 0){
             mysqli_free_result($balance_results); // free the result set
         }
     } else {
-        echo "Something is wrong with SQL: " . mysqli_error($con);
+        echo "Something is wrong with getting balance SQL: " . mysqli_error($con);
     }
 
     // Check if code does not already exist in transactions for user
@@ -80,13 +80,37 @@ if($amount <= 0){
 
     // Check if type of transaction is withdrawal
     if($type == "W"){
+        // check if amount to withdraw is greater than current balance
         if($amount > $total_balance){
-            echo "<p style='color:red'>Error! Customer $name has $$total_balance in the bank, and tries to withdraw $$amount. Not enough money!</p>";
+            echo "<p style='color:red'>Error! Customer $customer_name has $$total_balance in the bank, and tries to withdraw $$amount. Not enough money!</p>";
             die;
-        } else {
-            echo "Withdrawal has occurred";
+        } else { // will only get here if code entered is unique and amount of withdrawal is less than total_balance
+            $insert_withdrawal_sql = "insert into CPS3740_2022F.Money_coronapi (code, cid, type, amount, mydatetime, note, sid) values ('$code', '$id', '$type', $amount, NOW(), '$note', '$source_id')";
+
+            // execute the insertion query of withdrawal
+            $insert_withdrawal_result = mysqli_query($con, $insert_withdrawal_sql);
+            if($insert_withdrawal_result){
+                $new_balance = $total_balance - $amount;
+                echo "<br>Withdrawal of $$amount successful!";
+                echo "<br>Transaction ($code) has been added successfully.";
+                echo "<br>New balance: $$new_balance";
+            } else {
+                echo "Something is wrong with insertion SQL: " . mysqli_error($con);
+            }
         }
-        
+    } else { // will only get here is type is D, amount is positive, and code is unique
+        $insert_deposit_sql = "insert into CPS3740_2022F.Money_coronapi (code, cid, type, amount, mydatetime, note, sid) values ('$code', '$id', '$type', $amount, NOW(), '$note', '$source_id')";
+
+        // execute the insertion query of deposit
+        $insert_deposit_result = mysqli_query($con, $insert_deposit_sql);
+        if($insert_deposit_result) {
+            $new_balance = $total_balance + $amount;
+            echo "Deposit of $$amount successfull!";
+            echo "<br>Transaction ($code) has been added successfully.";
+            echo "<br>New balance: $$new_balance";
+        } else {
+            echo "Something is wrong with insertion SQL: " . mysqli_error($con);
+        }
     }
 }
 
