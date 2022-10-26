@@ -30,9 +30,22 @@ for($i = 0; $i < count($_POST['note']); $i++){
 }
 
 $mids_delete_length = count($mids_to_delete);
-echo "<h2>Will delete $mids_delete_length records from the table.</h2>";
-for($i = 0; $i < $mids_delete_length; $i++){
-    echo "<br>Record $i - $mids_to_delete[$i] will be deleted.";
+if($mids_delete_length > 0) {
+    echo "<h4>Will delete $mids_delete_length records from the table.</h4>";
+    for($i = 0; $i < $mids_delete_length; $i++){
+        $mid_to_delete = $mids_to_delete[$i];
+        $deletion_sql = "delete from CPS3740_2022F.Money_coronapi where cid='$customer_id' and mid='$mids_to_delete'";
+        $deletion_result = mysqli_query($con, $deletion_sql);
+
+        if($deletion_result){
+            echo "The Code $mid_to_delete has been deleted. <br>";
+        } else {
+            echo "Something is wrong with SQL: " . mysqli_error($con);
+        }
+    }
+    echo "$mids_delete_length records have been deleted. <br>";
+} else {
+    echo "No records will be deleted. <br>";
 }
 
 $mids_update_length = count($mids_to_possibly_update);
