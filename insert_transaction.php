@@ -23,6 +23,7 @@ $source_id = $_POST['source_id'];
 $note = $_POST['note'];
 $customer_name = $_POST['customer_name'];
 $id = $_COOKIE['userid']; // attained from cookie
+$current_total_balance = $_POST['balance'];
 
 #### inputs that require validation
 // Check if a radio button was selected
@@ -52,6 +53,7 @@ echo "Type: $type \n";
 echo "Source_Id: $source_id \n";
 echo "Amount: $amount \n";
 echo "Note: $note \n";
+echo "Balance Before Insertion: $current_total_balance";
 
 
 
