@@ -88,7 +88,7 @@
                     if($num_transactions == 0) 
                         echo "<h2>No transaction history.</h2>";
                     else {
-                        echo "<p>There are <strong>$num_transactions</strong> transactionsfor customer <strong>$name</strong>:</p>";
+                        echo "<p>There are <strong>$num_transactions</strong> transactions for customer <strong>$name</strong>:</p>";
                         echo "<table border=1>\n"; // opening transactions table tag
                         echo "<tbody>"; // opening tbody tag
                         echo "<tr><th>ID</th><th>Code</th><th>Type</th><th>Amount</th><th>Source</th><th>Date Time</th><th>Note</th></tr>";
@@ -179,12 +179,5 @@ function convertDOBToAge($dob){
     return $dob;
 }
 
-// function blobToString($blob){
-//     $char = explode(' ', $blob);
-//     $userStr = '';
-//     foreach($char as $ch) 
-//         $userStr .= chr(bindec($ch));
-//     return $userStr;
-// }
-// ?>
+?>
 
