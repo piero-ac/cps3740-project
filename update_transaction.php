@@ -30,9 +30,16 @@ for($i = 0; $i < count($_POST['note']); $i++){
 }
 
 $mids_delete_length = count($mids_to_delete);
+echo "<h2>Will delete $mids_delete_length records from the table.</h2>";
+for($i = 0; $i < $mids_delete_length; $i++){
+    echo "<br>Record $i - $mids_to_delete[$i] will be deleted.";
+}
+
 $mids_update_length = count($mids_to_possibly_update);
-echo "Will delete $mids_delete_length records from the table.";
 echo "Will check $mids_update_length records for possible update.";
+for($i = 0; $i < $mids_update_length; $i++){
+    echo "<br>Record $i - $mids_to_possibly_update[$i] will be checked for possible update.";
+}
 
 // var_dump($_POST);
 
