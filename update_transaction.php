@@ -88,7 +88,6 @@ for($i = 0; $i < $mids_update_length; $i++){
 
 }
 echo "<br>$num_records_updated records have been updated.";
-// var_dump($_POST);
 
 mysqli_close($con);
 ?>
