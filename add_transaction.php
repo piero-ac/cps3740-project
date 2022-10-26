@@ -23,29 +23,9 @@ $name = $_POST['customer_name'];
 
 // Find the current total balance
 $id = $_COOKIE['userid'];
-$balance_records_sql  = "select type, amount from CPS3740_2022F.Money_coronapi where cid=$id";
-$balance_results = mysqli_query($con, $balance_records_sql);
-$total_balance = 0;
 
-// If statement to determine total balance
-if($balance_records_sql){
-    $num_rows = mysqli_num_rows($balance_results);
-
-    if($num_rows == 0){
-        $total_balance = 0;
-    } else {
-        while($balance_row = mysqli_fetch_array($balance_results)){
-            $type = $balance_row['type'];
-            $amount = (int)$balance_row['amount'];
-            $total_balance = ($type == 'D') ? $total_balance + $amount : $total_balance - $amount;
-        }
-        mysqli_free_result($balance_results); // free the result set
-    }
-
-    echo "<p><strong>$name</strong> current balance is $total_balance.";
-} else {
-    echo "Something is wrong with SQL: " . mysqli_error($con);
-}
+$total_balance = getCurrentBalance($con, $id);
+echo "<p><strong>$name</strong> current balance is $total_balance.";
 
 // Form 
 echo <<<HTML
@@ -63,29 +43,29 @@ echo <<<HTML
         <input type="text" name="amount" required="required">
         <input type="hidden" name="balance" value='$total_balance'>
         <br>
-        Select a Source:
-        <select name="source_id">
 HTML;
 ?>
+Select a Source:
+<select name="source_id">
+    <?php
+    // Get sources from Sources table
+    $sources_sql = "select * from CPS3740.Sources";
+    $sources_results = mysqli_query($con, $sources_sql);
 
-<?php
-// Get sources from Sources table
-$sources_sql = "select * from CPS3740.Sources";
-$sources_results = mysqli_query($con, $sources_sql);
-
-if($sources_results){
-    while($sources_row = mysqli_fetch_array($sources_results)){
-        $value = $sources_row['id'];
-        $name = $sources_row['name'];
-        echo "<option value=$value>$name</option>";
+    if($sources_results){
+        while($sources_row = mysqli_fetch_array($sources_results)){
+            $value = $sources_row['id'];
+            $name = $sources_row['name'];
+            echo "<option value=$value>$name</option>";
+        }
+        mysqli_free_result($sources_results); // free the result set
+    } else {
+        echo "Something is wrong with SQL: " . mysqli_error($con);
     }
-    mysqli_free_result($sources_results); // free the result set
-} else {
-    echo "Something is wrong with SQL: " . mysqli_error($con);
-}
-
+    ?>
+</select>
+<?php
 echo <<<HTML
-        </select> 
         <br> 
         Note: 
         <input type="text" name="note">
@@ -94,6 +74,30 @@ echo <<<HTML
     </form>
 
 HTML;
+
+function getCurrentBalance($con, $id){
+    $balance_records_sql  = "select type, amount from CPS3740_2022F.Money_coronapi where cid=$id";
+    $balance_results = mysqli_query($con, $balance_records_sql);
+    $total_balance = 0;
+
+    if($balance_results){
+        $num_rows = mysqli_num_rows($balance_results);
+
+        if($num_rows == 0){
+            $total_balance = (int)$_POST['balance'];
+        } else {
+            while($balance_row = mysqli_fetch_array($balance_results)){
+                $balance_type = $balance_row['type'];
+                $balance_amount = (int)$balance_row['amount'];
+                $total_balance = ($balance_type == 'D') ? $total_balance + $balance_amount : $total_balance - $balance_amount;
+            }
+            mysqli_free_result($balance_results); // free the result set
+        }
+    } else {
+        echo "Something is wrong with getting balance SQL: " . mysqli_error($con);
+    }
+    return $total_balance;
+}
 
 
 mysqli_close($con);
