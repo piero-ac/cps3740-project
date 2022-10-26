@@ -12,4 +12,5 @@ $con = mysqli_connect($host, $username, $password, $dbname)
 
  ##### Logout Function #####
  echo "<a href='logout.php'>User Logout</a><br>";
+ echo "<p>You can only update the <strong>Note</strong> column.";
 ?>
