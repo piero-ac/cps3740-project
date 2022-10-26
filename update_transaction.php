@@ -52,7 +52,7 @@ $mids_update_length = count($mids_to_possibly_update);
 $num_records_updated = 0;
 
 for($i = 0; $i < $mids_update_length; $i++){
-    $mid_to_possibly_update = $mids_to_possibly_updatep[$i];
+    $mid_to_possibly_update = $mids_to_possibly_update[$i];
     $get_note_for_mid_sql = "select note from CPS3740_2022F.Money_coronapi where cid='$customer_id' and mid='$mid_to_possibly_update'";
     $get_note_for_mid_result = mysqli_query($con, $get_note_for_mid_sql);
 
@@ -71,7 +71,7 @@ for($i = 0; $i < $mids_update_length; $i++){
             $update_note = (strcmp($db_note, $notes[$i]) == 0) ? false : true;
 
             if($update_note){
-                $update_sql = "update CPS3740_2022F.Money_coronapi set note='$db_note' where cid='$customer_id' and mid='$mid_to_possibly_update'";
+                $update_sql = "update CPS3740_2022F.Money_coronapi set note='$notes[$i]' where cid='$customer_id' and mid='$mid_to_possibly_update'";
                 $update_result = mysqli_query($con, $update_sql);
 
                 if($update_result){
