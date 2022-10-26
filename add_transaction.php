@@ -47,5 +47,54 @@ if($balance_records_sql){
     echo "Something is wrong with SQL: " . mysqli_error($con);
 }
 
+// Form 
+echo <<<HTML
+    <form name="input" action="insert_transaction.php" method="POST" required="required">
+        <input type="hidden" name="customer_name" value='$name'>
+        Transaction Code:
+        <input type="text" name="code" required="required">
+        <br>
+        <input type="radio" name="type" value="D">
+        Deposit 
+        <input type="radio" name="type" value="W">
+        Withdrawal 
+        <br>
+        Amount:
+        <input type="text" name="amount" required="required">
+        <input type="hidden" name="balance" value='$total_balance'>
+        <br>
+        Select a Source:
+        <select name="source_id">
+HTML;
+?>
+
+<?php
+// Get sources from Sources table
+$sources_sql = "select * from CPS3740.Sources";
+$sources_results = mysqli_query($con, $sources_sql);
+
+if($sources_results){
+    while($sources_row = mysqli_fetch_array($sources_results)){
+        $value = $sources_row['id'];
+        $name = $sources_row['name'];
+        echo "<option value=$value>$name</option>";
+    }
+    mysqli_free_result($sources_results); // free the result set
+} else {
+    echo "Something is wrong with SQL: " . mysqli_error($con);
+}
+
+echo <<<HTML
+        </select> 
+        <br> 
+        Note: 
+        <input type="text" name="note">
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+
+HTML;
+
+
 mysqli_close($con);
 ?>
