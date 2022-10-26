@@ -16,10 +16,11 @@ $source_ids = array();
 $mids_to_delete = array(); // will store all the transactions ids to delete
 $mids_to_possibly_update = array(); // will store all the transcation ids to check if note message has changed
 
+// var_dump($_POST);
 
 // traverse all records to check for whether to update or delete
 for($i = 0; $i < count($_POST['note']); $i++){
-    if($_POST['cdelete'][$i] == 'Y'){
+    if(isset($_POST['cdelete'][$i])){
         array_push($mids_to_delete, $_POST['mid'][$i]); 
     } else {
         array_push($source_ids, $_POST['sid'][$i]);
@@ -28,7 +29,7 @@ for($i = 0; $i < count($_POST['note']); $i++){
     }
 }
 
-$mids_delete_length = count($mids_delete_length);
+$mids_delete_length = count($mids_to_delete);
 $mids_update_length = count($mids_to_possibly_update);
 echo "Will delete $mids_delete_length records from the table.";
 echo "Will check $mids_update_length records for possible update.";
