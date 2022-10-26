@@ -15,45 +15,92 @@ $con = mysqli_connect($host, $username, $password, $dbname)
 ##### Logout Function #####
 echo "<a href='logout.php'>User Logout</a><br>";
 
-
-##### Get the necessary inputs from the form and cookie array
-
-#### inputs that do not require validation
+##### Get the inputs from the form #####
 $source_id = $_POST['source_id'];
 $note = $_POST['note'];
 $customer_name = $_POST['customer_name'];
-$id = $_COOKIE['userid']; // attained from cookie
-$total_balance = 0;
+$id = $_COOKIE['userid']; 
 
-
-#### inputs that require validation
+## Find the transaction codes in the database for comparison
 $code = $_POST['code'];
+$codes_array = getCodes($con);
 
-// Check if a radio button was selected
-$type = "";
+## Find current balance
+$current_balance = getCurrentBalance($con, $id);
+
+## Find the amount being entered
+$amount = (int)$_POST['amount'];
+
+## Check if code already exists in the database
+if(in_array($code, $codes_array)){
+    echo "<p style='color:red'>Error! The transaction code $code already exists in the database.</p>";
+    die;
+}
+
+## Check if a radio button was selected;
 if(!isset($_POST['type'])){
     echo "Please select deposit or withdraw.";
     die;
-} else {
-    $type = $_POST['type'];
 }
+$type = $_POST['type'];
 
-// Check if the amount entered is valid and code is unique
-$amount = (int)$_POST['amount'];
-
+## Check if the amount entered is valid 
 if($amount <= 0){
     echo "Amount must be positive";
     die;
+} 
+##  Check if we are trying to withdraw more than what's available in account
+if($type == "W" && $amount > $current_balance){
+    echo "<p style='color:red'>Error! Customer $customer_name has $$current_balance in the bank, and tries to withdraw $$amount. Not enough money!</p>";
+    die;
+} 
 
-// Amount entered is valid
+$insert_sql = "insert into CPS3740_2022F.Money_coronapi (code, cid, type, amount, mydatetime, note, sid) values ('$code', '$id', '$type', $amount, NOW(), '$note', '$source_id')";
+
+# Execute the insertion query
+$insert_result = mysqli_query($con, $insert_sql);
+if($insert_result){
+    $new_balance = ($type=="W") ? $current_balance - $amount : $current_balance + $amount; 
+    if($type == "W")
+        echo "<br>Withdrawal of $$amount successful!";
+    else 
+        echo "<br>Deposit of $$amount successful!";  
+    echo "<br>Transaction ($code) has been added successfully.";
+    echo "<br>New balance: $$new_balance";
 } else {
+    echo "Something is wrong with insertion SQL: " . mysqli_error($con);
+}
 
-    // Find current balance and the transaction codes
-    $balance_records_sql  = "select code, type, amount from CPS3740_2022F.Money_coronapi where cid=$id";
+
+function getCodes($con){
+    $codes_sql = "select code from CPS3740_2022F.Money_coronapi";
+    $codes_results = mysqli_query($con, $codes_sql);
+    $codes_array = array();
+
+    if($codes_results){
+        $num_rows = mysqli_num_rows($codes_results);
+        
+        if($num_rows == 0){
+            echo "No transactions in database.";
+        } else {
+            while($code_row = mysqli_fetch_array($codes_results)){ 
+                $code = $code_row['code'];
+                array_push($codes_array, $code);
+            }
+            mysqli_free_result($codes_results);
+        }
+    } else {
+        echo "Something is wrong with getting codes SQL: " . mysqli_error($con);
+    }
+    return $codes_array;
+}
+
+function getCurrentBalance($con, $id){
+    $balance_records_sql  = "select type, amount from CPS3740_2022F.Money_coronapi where cid=$id";
     $balance_results = mysqli_query($con, $balance_records_sql);
-    $balance_codes = array(); // array's values will be compared with user entered code to check for uniqueness
+    $total_balance = 0;
 
-    if($balance_records_sql){
+    if($balance_results){
         $num_rows = mysqli_num_rows($balance_results);
 
         if($num_rows == 0){
@@ -62,8 +109,6 @@ if($amount <= 0){
             while($balance_row = mysqli_fetch_array($balance_results)){
                 $balance_type = $balance_row['type'];
                 $balance_amount = (int)$balance_row['amount'];
-                $balance_code = $balance_row['code'];
-                array_push($balance_codes, $balance_code); // push the codes into the balance_codes array
                 $total_balance = ($balance_type == 'D') ? $total_balance + $balance_amount : $total_balance - $balance_amount;
             }
             mysqli_free_result($balance_results); // free the result set
@@ -71,64 +116,9 @@ if($amount <= 0){
     } else {
         echo "Something is wrong with getting balance SQL: " . mysqli_error($con);
     }
-
-    // Check if code does not already exist in transactions for user
-    if(in_array($code, $balance_codes)){
-        echo "<p style='color:red'>Error! The transaction code $code already exists in the database.</p>";
-        die;
-    }
-
-    // Check if type of transaction is withdrawal
-    if($type == "W"){
-        // check if amount to withdraw is greater than current balance
-        if($amount > $total_balance){
-            echo "<p style='color:red'>Error! Customer $customer_name has $$total_balance in the bank, and tries to withdraw $$amount. Not enough money!</p>";
-            die;
-        } else { // will only get here if code entered is unique and amount of withdrawal is less than total_balance
-            $insert_withdrawal_sql = "insert into CPS3740_2022F.Money_coronapi (code, cid, type, amount, mydatetime, note, sid) values ('$code', '$id', '$type', $amount, NOW(), '$note', '$source_id')";
-
-            // execute the insertion query of withdrawal
-            $insert_withdrawal_result = mysqli_query($con, $insert_withdrawal_sql);
-            if($insert_withdrawal_result){
-                $new_balance = $total_balance - $amount;
-                echo "<br>Withdrawal of $$amount successful!";
-                echo "<br>Transaction ($code) has been added successfully.";
-                echo "<br>New balance: $$new_balance";
-            } else {
-                echo "Something is wrong with insertion SQL: " . mysqli_error($con);
-            }
-        }
-    } else { // will only get here is type is D, amount is positive, and code is unique
-        $insert_deposit_sql = "insert into CPS3740_2022F.Money_coronapi (code, cid, type, amount, mydatetime, note, sid) values ('$code', '$id', '$type', $amount, NOW(), '$note', '$source_id')";
-
-        // execute the insertion query of deposit
-        $insert_deposit_result = mysqli_query($con, $insert_deposit_sql);
-        if($insert_deposit_result) {
-            $new_balance = $total_balance + $amount;
-            echo "<br>Deposit of $$amount successful!";
-            echo "<br>Transaction ($code) has been added successfully.";
-            echo "<br>New balance: $$new_balance";
-        } else {
-            echo "Something is wrong with insertion SQL: " . mysqli_error($con);
-        }
-    }
+    return $total_balance;
 }
 
-// Display entered information (only get here after validating input except for code)
-// echo "Customer_name: $customer_name \n";
-// echo "Customer_id: $id \n";
-// echo "Code: $code \n";
-// echo "Type: $type \n";
-// echo "Source_Id: $source_id \n";
-// echo "Amount: $amount \n";
-// echo "Note: $note \n";
-// echo "Balance Before Insertion: $current_total_balance";
 
-
-##### Get Transactions for User
-
-
-
-
-
+mysqli_close($con);
 ?>
