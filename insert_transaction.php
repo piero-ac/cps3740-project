@@ -105,7 +105,7 @@ if($amount <= 0){
         $insert_deposit_result = mysqli_query($con, $insert_deposit_sql);
         if($insert_deposit_result) {
             $new_balance = $total_balance + $amount;
-            echo "Deposit of $$amount successfull!";
+            echo "<br>Deposit of $$amount successful!";
             echo "<br>Transaction ($code) has been added successfully.";
             echo "<br>New balance: $$new_balance";
         } else {
