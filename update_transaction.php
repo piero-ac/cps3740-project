@@ -34,7 +34,7 @@ if($mids_delete_length > 0) {
     echo "<h4>Will delete $mids_delete_length records from the table.</h4>";
     for($i = 0; $i < $mids_delete_length; $i++){
         $mid_to_delete = $mids_to_delete[$i];
-        $deletion_sql = "delete from CPS3740_2022F.Money_coronapi where cid='$customer_id' and mid='$mids_to_delete'";
+        $deletion_sql = "delete from CPS3740_2022F.Money_coronapi where cid='$customer_id' and mid='$mid_to_delete'";
         $deletion_result = mysqli_query($con, $deletion_sql);
 
         if($deletion_result){
