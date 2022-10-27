@@ -29,7 +29,7 @@ $codes_array = getCodes($con);
 $current_balance = getCurrentBalance($con, $id);
 
 ## Find the amount being entered
-$amount = (int)$_POST['amount'];
+$amount = (float)$_POST['amount'];
 
 ## Check if code already exists in the database
 if(in_array($code, $codes_array)){
@@ -104,11 +104,11 @@ function getCurrentBalance($con, $id){
         $num_rows = mysqli_num_rows($balance_results);
 
         if($num_rows == 0){
-            $total_balance = (int)$_POST['balance'];
+            $total_balance = (float)$_POST['balance'];
         } else {
             while($balance_row = mysqli_fetch_array($balance_results)){
                 $balance_type = $balance_row['type'];
-                $balance_amount = (int)$balance_row['amount'];
+                $balance_amount = (float)$balance_row['amount'];
                 $total_balance = ($balance_type == 'D') ? $total_balance + $balance_amount : $total_balance - $balance_amount;
             }
             mysqli_free_result($balance_results); // free the result set

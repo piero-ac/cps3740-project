@@ -102,10 +102,10 @@
                             
                             // determine color of number and current total balance
                             if($transaction_type == "Deposit"){
-                                $total_balance += (int)$transaction_amount;
+                                $total_balance += (float)$transaction_amount;
                                 $transaction_amount = "<font color='blue'> $transaction_amount </font>";
                             } else {
-                                $total_balance -= (int)$transaction_amount;
+                                $total_balance -= (float)$transaction_amount;
                                 $transaction_amount = "<font color='red'> -$transaction_amount </font>";
                             }   
 
