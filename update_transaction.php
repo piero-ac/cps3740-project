@@ -80,13 +80,14 @@ for($i = 0; $i < $mids_update_length; $i++){
                 } else {
                     echo "Something is wrong with update SQL: " . mysqli_error($con);
                 }
+
             }
         }
     } else {
         echo "Something is wrong with searching for note SQL: " . mysqli_error($con);
     }
-
 }
+
 echo "<br>$num_records_updated records have been updated.";
 
 mysqli_close($con);
