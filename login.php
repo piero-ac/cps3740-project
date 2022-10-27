@@ -142,10 +142,9 @@
                                     </form>
                                 </td>
                                 <td><a href='display_transaction.php'>Display and update transaction</a></td>
-                                <td><a href='display_stores.php' target='_blank'>Display stores</a></td>
                             </tr>
                             <tr>
-                                <td colspan=3>
+                                <td colspan=2>
                                     <form action="search_transaction.php" method='get'>
                                         Keyword:
                                         <input type="text" name="keywords" required='required'>
