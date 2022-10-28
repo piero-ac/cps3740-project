@@ -1,2 +1,3 @@
 # CPS3740 - Project
-# So Far Have Implemented Parts 1-3
+# Completed 10/27/22
+# Will add styling and refactor code next.
